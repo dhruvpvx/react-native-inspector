@@ -14,11 +14,17 @@ yarn add react-native-inspector
 
 ```js
 import { DebuggerButton } from 'react-native-inspector';
-
+import axios from 'axios'
 // ...
 // add this in root of your app with in the redux provider context
-<DebuggerButton />;
+<DebuggerButton providers={{axios}} />;
 ```
+### Props
+
+
+| Name                       | Type                                                                                      | Description                            
+| :------------------------- | :---------------------------------------------------------------------------------------- | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| `providers`                     | `{axios, state}`                                                                                     | **Required** axios to add interceper and root state of redux                                                                                                                                                                                              |
 
 ## Contributing
 
