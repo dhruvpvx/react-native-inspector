@@ -1,6 +1,6 @@
 {
   "name": "react-native-inspector",
-  "version": "0.1.1-next.0",
+  "version": "0.1.1-next.1",
   "description": "This is used to inspect api requests and redux state with in the device ui",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
