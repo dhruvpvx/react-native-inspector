@@ -1,25 +1,10 @@
 import React from 'react';
 import { ScrollView } from 'react-native';
-import { connect, type ConnectedProps } from 'react-redux';
 import { DataTransformer } from '../common';
+import { useDebugger } from '../../context';
 
-type RootState = {
-  [key: string]: any;
-};
-
-type ReduxStateProps = {
-  state: RootState | null;
-};
-
-const mapStateToProps = (state: RootState): ReduxStateProps => ({ state });
-
-const connector = connect(mapStateToProps);
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-type Props = PropsFromRedux & {};
-
-const ReduxState: React.FC<Props> = ({ state }) => {
+const ReduxState = () => {
+  const { state } = useDebugger();
   return (
     <ScrollView>
       <DataTransformer value={state || {}} />
@@ -27,4 +12,4 @@ const ReduxState: React.FC<Props> = ({ state }) => {
   );
 };
 
-export default connector(ReduxState);
+export default ReduxState;
