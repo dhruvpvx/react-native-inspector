@@ -11,7 +11,7 @@ export const Colors = {
   GREEN_BOLD: '#62A336',
 };
 
-interface DebuggerInterface {
+export interface DebuggerInterface {
   colors: typeof Colors | Record<string, string>;
   requests: ApiRequest[];
 }

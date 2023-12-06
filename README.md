@@ -6,16 +6,18 @@ This is used to inspect api requests and redux state with in the device ui
 
 ```sh
 npm install react-native-inspector
+
+yarn add react-native-inspector
 ```
 
 ## Usage
 
 ```js
-import { multiply } from 'react-native-inspector';
+import { DebuggerButton } from 'react-native-inspector';
 
 // ...
-
-const result = await multiply(3, 7);
+// add this in root of your app with in the redux provider context
+<DebuggerButton />;
 ```
 
 ## Contributing
