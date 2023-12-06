@@ -3,32 +3,24 @@ import { Image, Platform, StyleSheet } from 'react-native';
 import DebuggerSheet from './DebuggerSheet';
 import { DebuggerProvider, DebuggerContext } from '../../context';
 import { AppImages } from '../../resources';
-import Tools from '../../tools';
+
 import FloatingButton from './FloatingButton';
 
-type Debuggers = 'api-requests' | 'redux-store';
-const debuggers = [
-  {
-    title: 'Api Requests',
-    key: 'api-requests',
-    component: Tools.ApiRequests,
-  },
-  {
-    title: 'Redux Store',
-    key: 'redux-store',
-    component: Tools.ReduxState,
-  },
-] as {
-  title: string;
-  key: Debuggers;
-  component: React.FC;
-}[];
+type Providers = {
+  axios?: any;
+  state?: Record<string, any>;
+};
 
-const DebuggerButton = ({ tools }: { tools?: Debuggers[] }) => {
+const DebuggerButton = ({ providers }: { providers: Providers }) => {
   const [visible, setVisible] = React.useState(false);
 
+  if (!providers || Object.keys(providers).length === 0) {
+    console.error('DebuggerButton requires at least one provider');
+    return null;
+  }
+
   return (
-    <DebuggerProvider>
+    <DebuggerProvider {...providers}>
       <DebuggerContext.Consumer>
         {(props) => (
           <FloatingButton
@@ -38,11 +30,7 @@ const DebuggerButton = ({ tools }: { tools?: Debuggers[] }) => {
           >
             <Image source={AppImages.debugIcon} style={styles.debugIcon} />
             <DebuggerSheet
-              tools={
-                tools
-                  ? debuggers.filter((d) => tools.includes(d.key))
-                  : debuggers
-              }
+              tools={props.tools}
               visible={visible}
               close={() => setVisible(false)}
             />

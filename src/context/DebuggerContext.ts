@@ -11,14 +11,23 @@ export const Colors = {
   GREEN_BOLD: '#62A336',
 };
 
+type Debuggers = 'api-requests' | 'redux-store';
 export interface DebuggerInterface {
   colors: typeof Colors | Record<string, string>;
   requests: ApiRequest[];
+  state?: Record<string, any>;
+  axios?: any;
+  tools: {
+    title: string;
+    key: Debuggers;
+    component: React.FC;
+  }[];
 }
 
 const DebuggerContext = React.createContext<DebuggerInterface>({
   colors: Colors,
   requests: [],
+  tools: [],
 });
 
 export default DebuggerContext;
