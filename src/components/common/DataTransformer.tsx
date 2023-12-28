@@ -6,7 +6,9 @@ import { useDebugger } from '../../context';
 const DataTransformer = ({ value }: { value: DataCellData }) => {
   return (
     <>
-      {value ? (
+      {typeof value === 'string' ? (
+        <Text>{value}</Text>
+      ) : value ? (
         Object.entries(value).map(([key, dataValue]) => {
           return <DataKeyValue key={key} dataKey={key} dataValue={dataValue} />;
         })

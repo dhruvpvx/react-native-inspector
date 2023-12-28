@@ -1,26 +1,39 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Image, Platform, StyleSheet } from 'react-native';
 import DebuggerSheet from './DebuggerSheet';
 import { DebuggerProvider, DebuggerContext } from '../../context';
 import { AppImages } from '../../resources';
-
+import Tools from '../../tools';
 import FloatingButton from './FloatingButton';
 
 type Providers = {
-  axios?: any;
   state?: Record<string, any>;
 };
 
-const DebuggerButton = ({ providers }: { providers: Providers }) => {
+const DebuggerButton = ({ providers = {} }: { providers?: Providers }) => {
   const [visible, setVisible] = React.useState(false);
 
-  if (!providers || Object.keys(providers).length === 0) {
-    console.error('DebuggerButton requires at least one provider');
-    return null;
-  }
+  const tools = useMemo(() => {
+    const allTools = [
+      {
+        title: 'Redux Store',
+        key: 'redux-store',
+        component: Tools.ReduxState,
+        provider: providers.state,
+      },
+    ] as const;
+    return [
+      {
+        title: 'Api Requests',
+        key: 'api-requests' as const,
+        component: Tools.ApiRequests,
+      },
+      ...allTools.filter((tool) => !!tool.provider),
+    ];
+  }, [providers]);
 
   return (
-    <DebuggerProvider {...providers}>
+    <DebuggerProvider {...providers} tools={tools}>
       <DebuggerContext.Consumer>
         {(props) => (
           <FloatingButton

@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useDebugger } from '../../context';
 import { AppImages, Fonts } from '../../resources';
-import { ExtraDetails } from '../api-tools/';
+import ExtraDetails from '../api-tools/ExtraDetails';
 
 const ApiRequestCell = ({ request }: ApiRequestProps) => {
   const [open, setOpen] = React.useState(false);

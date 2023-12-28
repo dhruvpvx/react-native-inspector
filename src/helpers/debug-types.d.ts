@@ -10,6 +10,7 @@ interface DataCell {
   key: string;
   label: string;
   data: DataCellData;
+  type?: string;
 }
 interface ApiRequest {
   id: number;

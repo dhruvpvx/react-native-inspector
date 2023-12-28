@@ -1,39 +1,22 @@
-import React, { type PropsWithChildren, useMemo } from 'react';
+import React, { type PropsWithChildren } from 'react';
 import DebuggerContext, { Colors } from './DebuggerContext';
 import { useRequests } from '../hooks';
-import Tools from '../tools';
 
 interface Props {
   colors?: Record<string, string>;
-  axios?: any;
   state?: Record<string, any>;
+  tools: React.ComponentProps<
+    typeof DebuggerContext.Provider
+  >['value']['tools'];
 }
 
 const DebuggerProvider = ({
   colors,
-  axios,
   children,
   state,
+  tools,
 }: PropsWithChildren<Props>) => {
-  const requests = useRequests(axios);
-
-  const tools = useMemo(() => {
-    const allTools = [
-      {
-        title: 'Api Requests',
-        key: 'api-requests',
-        component: Tools.ApiRequests,
-        provider: axios,
-      },
-      {
-        title: 'Redux Store',
-        key: 'redux-store',
-        component: Tools.ReduxState,
-        provider: state,
-      },
-    ] as const;
-    return allTools.filter((tool) => !!tool.provider);
-  }, [axios, state]);
+  const requests = useRequests();
 
   return (
     <DebuggerContext.Provider
