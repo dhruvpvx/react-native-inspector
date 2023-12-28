@@ -7,17 +7,11 @@ import { AppImages } from '../../resources';
 import FloatingButton from './FloatingButton';
 
 type Providers = {
-  axios?: any;
   state?: Record<string, any>;
 };
 
-const DebuggerButton = ({ providers }: { providers: Providers }) => {
+const DebuggerButton = ({ providers = {} }: { providers?: Providers }) => {
   const [visible, setVisible] = React.useState(false);
-
-  if (!providers || Object.keys(providers).length === 0) {
-    console.error('DebuggerButton requires at least one provider');
-    return null;
-  }
 
   return (
     <DebuggerProvider {...providers}>

@@ -9,6 +9,7 @@ const useRequests = () => {
     function saveRequest(xhr: any, success: boolean) {
       const url = xhr._url;
       const paramsObj = xhr._params;
+
       setRequests((prev) => [
         {
           id: prev.length + 1,
@@ -36,13 +37,21 @@ const useRequests = () => {
               label: 'Response Headers',
               key: 'response_headers',
               data: xhr._responseHeaders,
+              type: 'string',
             },
             {
               label: 'Request Params',
               key: 'request_params',
               data: paramsObj,
             },
-          ].filter(({ data }) => data !== undefined && data !== null),
+          ].filter(
+            ({ data }) =>
+              data !== undefined &&
+              data !== null &&
+              data !== '' &&
+              data !== '{}' &&
+              data !== '[]'
+          ),
           heading_cells: {
             'Status Code': xhr._status,
             'Method': xhr._method,
@@ -66,13 +75,21 @@ const useRequests = () => {
 
     XHRInterceptor.setRequestHeaderCallback(
       (header: any, value: any, xhr: any) => {
-        xhr._requestHeaders = xhr._requestHeaders || {};
-        xhr._requestHeaders[header] = value;
+        try {
+          xhr._requestHeaders = xhr._requestHeaders;
+          xhr._requestHeaders[header] = value;
+        } catch (e) {
+          xhr._requestHeaders = { [header]: value };
+        }
       }
     );
 
     XHRInterceptor.setSendCallback((data: any, xhr: any) => {
-      xhr._requestData = data;
+      try {
+        xhr._requestData = JSON.parse(data);
+      } catch (e) {
+        xhr._requestData = data;
+      }
     });
 
     XHRInterceptor.setHeaderReceivedCallback(
@@ -94,7 +111,7 @@ const useRequests = () => {
         try {
           // xhr._response = response;
           xhr._response = JSON.parse(response);
-          saveRequest(xhr, true);
+          saveRequest(xhr, status.toString().startsWith('2'));
         } catch (e) {
           // console.log(e);
         }

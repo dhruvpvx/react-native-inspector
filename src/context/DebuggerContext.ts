@@ -16,7 +16,6 @@ export interface DebuggerInterface {
   colors: typeof Colors | Record<string, string>;
   requests: ApiRequest[];
   state?: Record<string, any>;
-  axios?: any;
   tools: {
     title: string;
     key: Debuggers;

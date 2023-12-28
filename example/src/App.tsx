@@ -7,5 +7,5 @@ export default function App() {
   React.useEffect(() => {
     axios.get('https://jsonplaceholder.typicode.com/todos/1');
   }, []);
-  return <DebuggerButton providers={{ axios }} />;
+  return <DebuggerButton />;
 }
