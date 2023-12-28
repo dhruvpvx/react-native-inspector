@@ -5,26 +5,18 @@ import Tools from '../tools';
 
 interface Props {
   colors?: Record<string, string>;
-  axios?: any;
   state?: Record<string, any>;
 }
 
 const DebuggerProvider = ({
   colors,
-  axios,
   children,
   state,
 }: PropsWithChildren<Props>) => {
-  const requests = useRequests(axios);
+  const requests = useRequests();
 
   const tools = useMemo(() => {
     const allTools = [
-      {
-        title: 'Api Requests',
-        key: 'api-requests',
-        component: Tools.ApiRequests,
-        provider: axios,
-      },
       {
         title: 'Redux Store',
         key: 'redux-store',
@@ -32,8 +24,15 @@ const DebuggerProvider = ({
         provider: state,
       },
     ] as const;
-    return allTools.filter((tool) => !!tool.provider);
-  }, [axios, state]);
+    return [
+      {
+        title: 'Api Requests',
+        key: 'api-requests' as const,
+        component: Tools.ApiRequests,
+      },
+      ...allTools.filter((tool) => !!tool.provider),
+    ];
+  }, [state]);
 
   return (
     <DebuggerContext.Provider

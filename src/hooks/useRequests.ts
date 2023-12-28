@@ -1,89 +1,111 @@
 import { useEffect, useState } from 'react';
+// @ts-ignore
+import XHRInterceptor from 'react-native/Libraries/Network/XHRInterceptor';
 
-const useRequests = (axios: any) => {
+const useRequests = () => {
   const [requests, setRequests] = useState<ApiRequest[]>([]);
 
-  useEffect(() => {
-    if (axios) {
-      axios.interceptors.request.use((request: any) => {
-        request.startTime = new Date().getTime();
-        return request;
-      });
-      const saveRequest = (response: any, success: boolean) => {
-        const [url, params] = response.config.url?.split('?') || [];
-        const paramsObj = (params as string)?.split('&').reduce(
-          (acc, curr) => {
-            const [key, value] = curr.split('=');
-            return {
-              ...acc,
-              [key as string]: value,
-            };
-          },
-          {
-            ...response.config.params,
-          }
-        );
-
-        setRequests((prev) => [
-          {
-            id: prev.length + 1,
-            method: response.config.method,
-            url: url,
-            full_url: (response.config.baseURL || '') + url,
-            success,
-            data_cells: [
-              {
-                label: 'Response',
-                key: 'response',
-                data: response.data,
-              },
-              {
-                label: 'Request Headers',
-                key: 'request_headers',
-                data: response.config.headers,
-              },
-              {
-                label: 'Request Body',
-                key: 'request_body',
-                data: response.config.data
-                  ? JSON.parse(response.config.data)
-                  : undefined,
-              },
-              {
-                label: 'Response Headers',
-                key: 'response_headers',
-                data: response.headers,
-              },
-              {
-                label: 'Request Params',
-                key: 'request_params',
-                data: paramsObj,
-              },
-            ].filter(({ data }) => data !== undefined && data !== null),
-            heading_cells: {
-              'Status Code': response.status,
-              'Method': response.config.method?.toUpperCase(),
-              'Duration': `${
-                new Date().getTime() - response.config.startTime
-              }ms`,
+  function enableXHRInterception(): void {
+    function saveRequest(xhr: any, success: boolean) {
+      const url = xhr._url;
+      const paramsObj = xhr._params;
+      setRequests((prev) => [
+        {
+          id: prev.length + 1,
+          method: xhr._method,
+          url: url,
+          full_url: url,
+          success,
+          data_cells: [
+            {
+              label: 'Response',
+              key: 'response',
+              data: xhr._response,
             },
-            response,
+            {
+              label: 'Request Headers',
+              key: 'request_headers',
+              data: xhr._requestHeaders,
+            },
+            {
+              label: 'Request Body',
+              key: 'request_body',
+              data: xhr._requestData,
+            },
+            {
+              label: 'Response Headers',
+              key: 'response_headers',
+              data: xhr._responseHeaders,
+            },
+            {
+              label: 'Request Params',
+              key: 'request_params',
+              data: paramsObj,
+            },
+          ].filter(({ data }) => data !== undefined && data !== null),
+          heading_cells: {
+            'Status Code': xhr._status,
+            'Method': xhr._method,
+            'Duration': `${new Date().getTime() - xhr._startTime}ms`,
           },
-          ...prev,
-        ]);
-      };
-      axios.interceptors.response.use(
-        (response: any) => {
-          saveRequest(response, true);
-          return response;
+          response: xhr._response,
         },
-        (response: any) => {
-          saveRequest(JSON.parse(JSON.stringify(response)), false);
-          return Promise.reject(response);
-        }
-      );
+        ...prev,
+      ]);
     }
-  }, [axios]);
+    if (XHRInterceptor.isInterceptorEnabled()) {
+      return;
+    }
+
+    XHRInterceptor.setOpenCallback((method: any, url: any, xhr: any) => {
+      xhr._startTime = new Date().getTime();
+      xhr._method = method;
+      xhr._url = url;
+      xhr._params = xhr._urlParams;
+    });
+
+    XHRInterceptor.setRequestHeaderCallback(
+      (header: any, value: any, xhr: any) => {
+        xhr._requestHeaders = xhr._requestHeaders || {};
+        xhr._requestHeaders[header] = value;
+      }
+    );
+
+    XHRInterceptor.setSendCallback((data: any, xhr: any) => {
+      xhr._requestData = data;
+    });
+
+    XHRInterceptor.setHeaderReceivedCallback(
+      (_type: any, _size: any, responseHeaders: any, xhr: any) => {
+        xhr._responseHeaders = responseHeaders;
+      }
+    );
+
+    XHRInterceptor.setResponseCallback(
+      (
+        status: any,
+        _timeout: any,
+        response: any,
+        _responseURL: any,
+        _responseType: any,
+        xhr: any
+      ) => {
+        xhr._status = status;
+        try {
+          // xhr._response = response;
+          xhr._response = JSON.parse(response);
+          saveRequest(xhr, true);
+        } catch (e) {
+          // console.log(e);
+        }
+      }
+    );
+    XHRInterceptor.enableInterception();
+  }
+
+  useEffect(() => {
+    enableXHRInterception();
+  }, []);
 
   return requests;
 };
